@@ -26,7 +26,6 @@ export function DelineateIcon({
   style,
 }: DelineateIconProps) {
   // Resolve colors based on mode
-  const isDark = mode === 'dark' || mode === 'auto';
   const isLight = mode === 'light';
 
   const bg          = isLight ? '#F4F5F8' : '#1a1a1e';

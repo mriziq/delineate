@@ -87,6 +87,6 @@ export interface PendingChange {
   }
 }
 
-export type Screen = 'setup' | 'filter' | 'triage' | 'review'
+export type Screen = 'setup' | 'workspace' | 'review'
 export type Overlay = 'estimate' | 'label' | 'assignee' | 'project' | 'cheatsheet' | 'detail' | null
 export type Theme = 'dark' | 'light'

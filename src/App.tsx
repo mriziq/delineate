@@ -3,8 +3,7 @@ import { AppContext, appReducer, initialState, saveSession, loadSession, clearSe
 import type { TriageSession } from './store/useAppStore'
 import { checkSession } from './api/linear'
 import SetupScreen from './screens/SetupScreen'
-import FilterScreen from './screens/FilterScreen'
-import TriageScreen from './screens/TriageScreen'
+import WorkspaceScreen from './screens/WorkspaceScreen'
 import ReviewScreen from './screens/ReviewScreen'
 
 function ResumePrompt({
@@ -114,7 +113,7 @@ export default function App() {
   const [pendingSession, setPendingSession] = useState<TriageSession | null>(null)
   const [authReady, setAuthReady] = useState(false)
   const stateRef = useRef(state)
-  stateRef.current = state
+  useEffect(() => { stateRef.current = state })
 
   // Apply theme
   useEffect(() => {
@@ -132,7 +131,7 @@ export default function App() {
           if (session) {
             setPendingSession(session)
           } else {
-            dispatch({ type: 'SET_SCREEN', screen: 'filter' })
+            dispatch({ type: 'SET_SCREEN', screen: 'workspace' })
           }
         }
         setAuthReady(true)
@@ -144,7 +143,7 @@ export default function App() {
 
   // Auto-save session
   useEffect(() => {
-    if (state.screen !== 'triage' && state.screen !== 'review') return
+    if (state.screen !== 'workspace' && state.screen !== 'review') return
     if (state.issues.length === 0) return
     saveSession(state)
   }, [state.issues, state.currentIndex, state.pendingChanges, state.screen])
@@ -154,7 +153,7 @@ export default function App() {
     function handleBeforeUnload(e: BeforeUnloadEvent) {
       const s = stateRef.current
       if (
-        (s.screen === 'triage' || s.screen === 'review') &&
+        (s.screen === 'workspace' || s.screen === 'review') &&
         s.pendingChanges.some(pc => Object.keys(pc.changes).length > 0)
       ) {
         e.preventDefault()
@@ -197,14 +196,13 @@ export default function App() {
   function handleDiscard() {
     clearSession()
     setPendingSession(null)
-    dispatch({ type: 'SET_SCREEN', screen: 'filter' })
+    dispatch({ type: 'SET_SCREEN', screen: 'workspace' })
   }
 
   function renderScreen() {
     switch (state.screen) {
       case 'setup': return <SetupScreen />
-      case 'filter': return <FilterScreen />
-      case 'triage': return <TriageScreen />
+      case 'workspace': return <WorkspaceScreen />
       case 'review': return <ReviewScreen />
     }
   }

@@ -46,9 +46,10 @@ export default function LabelPicker({ labels, selectedIds, onToggle, onClose }: 
     return () => cancelAnimationFrame(raf)
   }, [])
 
-  useEffect(() => {
+  function updateSearch(val: string) {
+    setSearch(val)
     setHighlightIndex(0)
-  }, [search])
+  }
 
   return (
     <div className="overlay-backdrop" onClick={onClose}>
@@ -59,7 +60,7 @@ export default function LabelPicker({ labels, selectedIds, onToggle, onClose }: 
           className="input picker-search"
           placeholder="Search labels..."
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={e => updateSearch(e.target.value)}
         />
         <div className="picker-list">
           {filtered.map((label, idx) => (

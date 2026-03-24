@@ -267,7 +267,7 @@ export function appReducer(state: AppState, action: Action): AppState {
       const s = action.session
       return {
         ...state,
-        screen: 'triage',
+        screen: 'workspace',
         issues: s.issues,
         currentIndex: s.currentIndex,
         pendingChanges: s.pendingChanges,
