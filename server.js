@@ -78,16 +78,31 @@ const apiLimiter = rateLimit({
 })
 
 // App URL — in dev this is the Vite server, in prod the same origin
-const APP_URL = process.env.APP_URL || `http://localhost:${PORT}`
+const APP_URL = (process.env.APP_URL || `http://localhost:${PORT}`).replace(/\/+$/, '')
 
-function getRedirectUri() {
+function getRedirectUri(req) {
+  // In production, derive from the request to handle any domain correctly
+  if (IS_PROD && req) {
+    const proto = req.header('x-forwarded-proto') || 'https'
+    const host = req.header('host')
+    if (host) return `${proto}://${host}/auth/callback`
+  }
   return `${APP_URL}/auth/callback`
+}
+
+function getAppOrigin(req) {
+  if (IS_PROD && req) {
+    const proto = req.header('x-forwarded-proto') || 'https'
+    const host = req.header('host')
+    if (host) return `${proto}://${host}`
+  }
+  return APP_URL
 }
 
 // --- Auth routes ---
 
 app.get('/auth/login', authLimiter, (req, res) => {
-  const redirectUri = getRedirectUri()
+  const redirectUri = getRedirectUri(req)
   const state = crypto.randomBytes(32).toString('hex')
   req.session.oauthState = state
   const params = new URLSearchParams({
@@ -115,7 +130,7 @@ app.get('/auth/callback', authLimiter, async (req, res) => {
   }
 
   try {
-    const redirectUri = getRedirectUri()
+    const redirectUri = getRedirectUri(req)
     const tokenRes = await fetch('https://api.linear.app/oauth/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -160,7 +175,7 @@ app.get('/auth/callback', authLimiter, async (req, res) => {
     req.session.organization = organization || null
 
     // Redirect to the app
-    res.redirect(APP_URL)
+    res.redirect(getAppOrigin(req))
   } catch (err) {
     console.error('OAuth callback error:', err instanceof Error ? err.message : 'Unknown error')
     res.status(500).send('Authentication failed')
