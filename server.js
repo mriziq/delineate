@@ -56,7 +56,7 @@ app.use(cookieSession({
   secret: SESSION_SECRET,
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   httpOnly: true,
-  sameSite: 'strict',
+  sameSite: 'lax',
   secure: IS_PROD,
 }))
 
