@@ -1,3 +1,4 @@
+import Markdown from 'react-markdown'
 import type { Issue, PendingChange, Label } from '../api/types'
 
 const PRIORITY_LABELS: Record<number, string> = {
@@ -68,11 +69,11 @@ export default function IssueCard({ issue, pending, availableLabels, onClick, co
       <h3 className="card-title">{issue.title}</h3>
 
       {!compact && issue.description && (
-        <p className="card-description">
-          {issue.description.length > 300
+        <div className="card-description">
+          <Markdown>{issue.description.length > 300
             ? issue.description.slice(0, 300) + '...'
-            : issue.description}
-        </p>
+            : issue.description}</Markdown>
+        </div>
       )}
 
       <div className="card-divider" />
@@ -185,28 +186,59 @@ export default function IssueCard({ issue, pending, availableLabels, onClick, co
         }
         .card-identifier {
           font-family: var(--font-mono);
-          font-size: 0.8rem;
+          font-size: 0.72rem;
           color: var(--text-muted);
           font-variant-numeric: tabular-nums;
+          font-weight: 400;
         }
 
         /* Title + desc */
         .card-title {
-          font-size: 1.1rem;
-          font-weight: 500;
+          font-size: 1rem;
+          font-weight: 400;
           line-height: 1.4;
+          letter-spacing: -0.01em;
           margin-bottom: var(--sp-2);
         }
         .card-description {
           color: var(--text-secondary);
-          font-size: 0.85rem;
+          font-size: 0.875rem;
           line-height: 1.5;
+          font-weight: 400;
           margin-bottom: var(--sp-2);
           display: -webkit-box;
           -webkit-line-clamp: 4;
           -webkit-box-orient: vertical;
           overflow: hidden;
           flex: 1;
+        }
+        .card-description p { margin: 0; }
+        .card-description h1,
+        .card-description h2,
+        .card-description h3,
+        .card-description h4 {
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: var(--text-primary);
+          margin: 0;
+        }
+        .card-description ul,
+        .card-description ol {
+          padding-left: 1.2em;
+          margin: 0;
+        }
+        .card-description code {
+          font-family: var(--font-mono);
+          font-size: 0.8em;
+          background: var(--chip-bg);
+          padding: 1px 4px;
+          border-radius: 3px;
+        }
+        .card-description a {
+          color: var(--accent);
+        }
+        .card-description img {
+          display: none;
         }
         .card-divider {
           height: 1px;
@@ -237,10 +269,11 @@ export default function IssueCard({ issue, pending, availableLabels, onClick, co
           100% { background: rgba(94, 106, 210, 0.1); }
         }
         .field-label {
-          font-size: 0.65rem;
+          font-size: 0.72rem;
           color: var(--text-muted);
           text-transform: uppercase;
           letter-spacing: 0.04em;
+          font-weight: 400;
         }
         .card-labels {
           display: flex;
@@ -261,9 +294,9 @@ export default function IssueCard({ issue, pending, availableLabels, onClick, co
           border: 1px solid var(--border-light);
           border-radius: 20px;
           padding: 3px 10px;
-          font-size: 0.75rem;
+          font-size: 0.72rem;
           white-space: nowrap;
-          font-weight: 500;
+          font-weight: 400;
         }
         .card-chip .dot {
           width: 7px;
@@ -272,11 +305,11 @@ export default function IssueCard({ issue, pending, availableLabels, onClick, co
           flex-shrink: 0;
         }
         .card-status-chip {
-          font-size: 0.7rem;
+          font-size: 0.72rem;
           padding: 2px 8px;
         }
         .label-chip {
-          font-weight: 500;
+          font-weight: 400;
         }
 
         /* Project row at bottom */
@@ -285,12 +318,13 @@ export default function IssueCard({ issue, pending, availableLabels, onClick, co
           display: flex;
         }
         .card-project-chip {
-          font-size: 0.7rem;
+          font-size: 0.72rem;
           background: var(--chip-bg);
           color: var(--text-secondary);
+          font-weight: 400;
         }
         .card-project-changed {
-          font-size: 0.6rem;
+          font-size: 0.72rem;
           color: var(--accent);
           margin-left: var(--sp-1);
         }
@@ -301,13 +335,15 @@ export default function IssueCard({ issue, pending, availableLabels, onClick, co
           font-size: 0.72rem;
           color: var(--accent);
           text-align: center;
+          font-weight: 400;
         }
         .card-expand-hint {
           position: absolute;
           top: var(--sp-2);
           right: var(--sp-3);
-          font-size: 0.65rem;
+          font-size: 0.72rem;
           color: var(--text-muted);
+          font-weight: 400;
           opacity: 0;
           transition: opacity 150ms;
         }

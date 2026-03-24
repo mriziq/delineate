@@ -1,4 +1,4 @@
-# Triage — Linear Issue Triage Tool
+# Delineate — Linear Issue Triage Tool
 
 A keyboard-driven app for blazing through your Linear backlog. Swipe through issues, set priority, estimate, labels, assignee, and project — then commit all changes in one batch.
 
@@ -8,7 +8,7 @@ A keyboard-driven app for blazing through your Linear backlog. Swipe through iss
 
 Go to **Linear Settings > API > OAuth Applications > New OAuth Application**.
 
-- **Name**: Triage (or whatever you like)
+- **Name**: Delineate (or whatever you like)
 - **Redirect URI**: `http://localhost:5173/auth/callback` for local dev, `https://yourdomain.com/auth/callback` for production
 
 You'll get a **Client ID** and **Client Secret**.

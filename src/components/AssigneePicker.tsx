@@ -108,8 +108,8 @@ export default function AssigneePicker({ members, currentAssigneeId, onSelect, o
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 0.65rem;
-          font-weight: 500;
+          font-size: 0.72rem;
+          font-weight: 400;
         }
       `}</style>
     </div>

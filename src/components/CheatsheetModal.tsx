@@ -75,6 +75,7 @@ export default function CheatsheetModal({ onClose }: Props) {
         }
         .cheatsheet-section-title {
           font-size: 0.72rem;
+          font-weight: 500;
           text-transform: uppercase;
           letter-spacing: 0.04em;
           color: var(--text-muted);
@@ -92,7 +93,8 @@ export default function CheatsheetModal({ onClose }: Props) {
           min-width: 80px;
         }
         .cheatsheet-desc {
-          font-size: 0.8rem;
+          font-size: 0.875rem;
+          font-weight: 400;
           color: var(--text-secondary);
         }
         .cheatsheet-dismiss {

@@ -109,15 +109,17 @@ export default function LabelPicker({ labels, selectedIds, onToggle, onClose }: 
         }
         .picker-item-name {
           flex: 1;
-          font-size: 0.85rem;
+          font-size: 0.875rem;
+          font-weight: 400;
         }
         .picker-check {
           color: var(--accent);
-          font-size: 0.85rem;
+          font-size: 0.875rem;
         }
         .picker-empty {
           color: var(--text-muted);
-          font-size: 0.8rem;
+          font-size: 0.875rem;
+          font-weight: 400;
           text-align: center;
           padding: var(--sp-4);
         }

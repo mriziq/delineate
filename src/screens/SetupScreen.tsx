@@ -1,8 +1,12 @@
+import { DelineateLockup } from '../components/DelineateIcon'
+
 export default function SetupScreen() {
   return (
     <div className="setup-screen">
       <div className="setup-card">
-        <div className="setup-logo">&#9889; triage</div>
+        <div className="setup-logo">
+          <DelineateLockup iconSize={32} fontSize={22} />
+        </div>
         <p className="setup-subtitle">Connect your Linear workspace to start triaging</p>
         <a href="/auth/login" className="btn-primary setup-btn">
           Sign in with Linear
@@ -25,14 +29,14 @@ export default function SetupScreen() {
           text-align: center;
         }
         .setup-logo {
-          font-size: 1.75rem;
-          font-weight: 600;
-          margin-bottom: var(--sp-2);
-          letter-spacing: -0.02em;
+          display: flex;
+          justify-content: center;
+          margin-bottom: var(--sp-3);
         }
         .setup-subtitle {
           color: var(--text-secondary);
           font-size: 0.875rem;
+          font-weight: 400;
           margin-bottom: var(--sp-6);
         }
         .setup-btn {
@@ -41,7 +45,7 @@ export default function SetupScreen() {
           padding: var(--sp-3) var(--sp-4);
           text-align: center;
           text-decoration: none;
-          font-size: 0.9rem;
+          font-size: 0.875rem;
         }
       `}</style>
     </div>

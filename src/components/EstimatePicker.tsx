@@ -66,12 +66,13 @@ export default function EstimatePicker({ currentEstimate, onSelect, onClose }: P
         }
         .overlay-title {
           font-size: 1rem;
-          font-weight: 500;
+          font-weight: 400;
           margin-bottom: var(--sp-1);
         }
         .overlay-hint {
-          font-size: 0.75rem;
+          font-size: 0.72rem;
           color: var(--text-muted);
+          font-weight: 400;
           margin-bottom: var(--sp-4);
         }
         .estimate-grid {
@@ -102,20 +103,22 @@ export default function EstimatePicker({ currentEstimate, onSelect, onClose }: P
         }
         .estimate-value {
           font-size: 1.25rem;
-          font-weight: 600;
+          font-weight: 300;
         }
         .estimate-label {
-          font-size: 0.6rem;
+          font-size: 0.72rem;
           color: var(--text-muted);
+          font-weight: 400;
           text-align: center;
         }
         .estimate-key {
           font-family: var(--font-mono);
-          font-size: 0.6rem;
+          font-size: 0.72rem;
+          font-weight: 400;
           color: var(--text-muted);
           background: var(--key-bg);
           border: 1px solid var(--border-medium);
-          border-radius: 3px;
+          border-radius: var(--radius-sm);
           padding: 1px 4px;
         }
         @media (max-width: 600px) {

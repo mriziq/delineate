@@ -53,12 +53,14 @@ function ResumePrompt({
           text-align: center;
         }
         .resume-title {
-          font-size: 1.05rem;
-          font-weight: 600;
+          font-size: 1.125rem;
+          font-weight: 300;
+          letter-spacing: -0.01em;
           margin-bottom: var(--sp-2);
         }
         .resume-desc {
-          font-size: 0.85rem;
+          font-size: 0.875rem;
+          font-weight: 400;
           color: var(--text-secondary);
           margin-bottom: var(--sp-4);
         }
@@ -75,11 +77,12 @@ function ResumePrompt({
         }
         .resume-stat-value {
           font-size: 1.5rem;
-          font-weight: 600;
+          font-weight: 300;
           font-variant-numeric: tabular-nums;
         }
         .resume-stat-label {
           font-size: 0.72rem;
+          font-weight: 400;
           color: var(--text-muted);
         }
         .resume-actions {

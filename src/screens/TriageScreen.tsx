@@ -1,5 +1,7 @@
 import { useEffect, useCallback, useState, useRef } from 'react'
+import Markdown from 'react-markdown'
 import { useApp } from '../store/useAppStore'
+import AppHeader from '../components/AppHeader'
 import IssueCard from '../components/IssueCard'
 import ShortcutBar from '../components/ShortcutBar'
 import EstimatePicker from '../components/EstimatePicker'
@@ -232,11 +234,46 @@ export default function TriageScreen() {
   if (issues.length === 0) {
     return (
       <div className="triage-screen">
+        <div className="empty-confetti" aria-hidden="true">
+          {Array.from({ length: 40 }, (_, i) => (
+            <div
+              key={i}
+              className="empty-confetti-piece"
+              style={{
+                '--x': `${Math.random() * 100}%`,
+                '--delay': `${Math.random() * 600}ms`,
+                '--duration': `${1200 + Math.random() * 800}ms`,
+                '--color': ['#5e6ad2','#4cb782','#f2c94c','#a78bfa','#f472b6','#f2994a'][i % 6],
+                '--rotation': `${Math.random() * 360}deg`,
+                '--size': `${4 + Math.random() * 5}px`,
+                '--drift': `${-25 + Math.random() * 50}px`,
+              } as React.CSSProperties}
+            />
+          ))}
+        </div>
         <div className="triage-empty">
-          <p>No issues to triage</p>
-          <button className="btn-secondary" onClick={() => dispatch({ type: 'SET_SCREEN', screen: 'filter' })}>
-            Adjust filters
-          </button>
+          {/* Animated checkmark */}
+          <div className="empty-icon">
+            <svg width="56" height="56" viewBox="0 0 56 56" fill="none" className="empty-checkmark">
+              <circle cx="28" cy="28" r="26" stroke="currentColor" strokeWidth="2" className="empty-circle" />
+              <path d="M18 29l7 7 13-15" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="empty-check" />
+            </svg>
+          </div>
+          <h2 className="empty-title">You're all caught up</h2>
+          <p className="empty-subtitle">No issues match your current filters — inbox zero!</p>
+          <div className="empty-actions">
+            <button className="btn-primary" onClick={() => dispatch({ type: 'SET_SCREEN', screen: 'filter' })}>
+              Adjust filters
+            </button>
+            <a
+              href="https://linear.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary"
+            >
+              Open Linear &rarr;
+            </a>
+          </div>
         </div>
       </div>
     )
@@ -264,20 +301,15 @@ export default function TriageScreen() {
       {/* Header */}
       <div className="triage-header">
         <div className="triage-header-left">
+          <AppHeader />
           <button
             className="btn-secondary triage-back-btn"
             onClick={() => dispatch({ type: 'SET_SCREEN', screen: 'filter' })}
           >
-            &larr; Filter Mode
+            &larr; Filters
           </button>
         </div>
         <div className="triage-header-center">
-          <div className="triage-mode-row">
-            <p className="triage-mode-label">Triage Mode</p>
-            {state.organization && (
-              <span className="workspace-badge">{state.organization.name}</span>
-            )}
-          </div>
           <div className="triage-scope-chips">
             <span className="scope-chip scope-chip-primary">{scopeLabel}</span>
             {stateLabels.map(s => (
@@ -397,7 +429,9 @@ export default function TriageScreen() {
             </div>
             <h2 className="detail-title">{currentIssue.title}</h2>
             {currentIssue.description && (
-              <div className="detail-description">{currentIssue.description}</div>
+              <div className="detail-description">
+                <Markdown>{currentIssue.description}</Markdown>
+              </div>
             )}
             <div className="card-divider" style={{ margin: '16px 0' }} />
             <div className="card-fields">
@@ -504,7 +538,7 @@ export default function TriageScreen() {
           height: 100%;
           display: flex;
           flex-direction: column;
-          padding-bottom: 48px;
+          padding-bottom: 44px;
           position: relative;
           overflow: hidden;
         }
@@ -521,6 +555,9 @@ export default function TriageScreen() {
           gap: var(--sp-3);
         }
         .triage-header-left {
+          display: flex;
+          align-items: center;
+          gap: var(--sp-3);
           flex-shrink: 0;
         }
         .triage-header-center {
@@ -531,29 +568,6 @@ export default function TriageScreen() {
           gap: 2px;
           min-width: 0;
         }
-        .triage-mode-row {
-          display: flex;
-          align-items: center;
-          gap: var(--sp-2);
-          justify-content: center;
-        }
-        .triage-mode-label {
-          font-size: 0.65rem;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          color: var(--accent);
-          font-weight: 600;
-        }
-        .workspace-badge {
-          font-size: 0.6rem;
-          padding: 1px 6px;
-          border-radius: 10px;
-          background: var(--chip-bg);
-          border: 1px solid var(--border-light);
-          color: var(--text-secondary);
-          white-space: nowrap;
-          font-weight: 500;
-        }
         .triage-scope-chips {
           display: flex;
           align-items: center;
@@ -562,17 +576,18 @@ export default function TriageScreen() {
           justify-content: center;
         }
         .scope-chip {
-          font-size: 0.65rem;
-          padding: 1px 6px;
-          border-radius: 3px;
+          font-size: 0.72rem;
+          padding: 2px 7px;
+          border-radius: var(--radius-sm);
           background: var(--chip-bg);
           border: 1px solid var(--border-subtle);
           color: var(--text-muted);
           white-space: nowrap;
+          font-weight: 400;
         }
         .scope-chip-primary {
           color: var(--text-primary);
-          font-weight: 500;
+          font-weight: 400;
         }
         .triage-header-right {
           display: flex;
@@ -582,9 +597,10 @@ export default function TriageScreen() {
         }
         .triage-counter {
           font-family: var(--font-mono);
-          font-size: 0.8rem;
+          font-size: 0.72rem;
           color: var(--text-muted);
           font-variant-numeric: tabular-nums;
+          font-weight: 400;
         }
         .triage-back-btn {
           padding: var(--sp-1) var(--sp-3);
@@ -606,8 +622,8 @@ export default function TriageScreen() {
           justify-content: center;
           background: var(--accent);
           color: white;
-          font-size: 0.7rem;
-          font-weight: 600;
+          font-size: 0.72rem;
+          font-weight: 500;
           min-width: 18px;
           height: 18px;
           border-radius: 9px;
@@ -636,6 +652,18 @@ export default function TriageScreen() {
           position: relative;
           perspective: 1200px;
           transition: margin-right 250ms cubic-bezier(0.22, 1, 0.36, 1);
+          background: radial-gradient(
+            ellipse at center,
+            transparent 0%,
+            rgba(0, 0, 0, 0.15) 100%
+          );
+        }
+        [data-theme="light"] .triage-card-area {
+          background: radial-gradient(
+            ellipse at center,
+            transparent 0%,
+            rgba(0, 0, 0, 0.04) 100%
+          );
         }
         .triage-card-area-shifted {
           margin-right: 0;
@@ -665,7 +693,7 @@ export default function TriageScreen() {
           flex-shrink: 0;
         }
         .drawer-title {
-          font-size: 0.85rem;
+          font-size: 0.875rem;
           font-weight: 500;
         }
         .drawer-review-all {
@@ -704,12 +732,14 @@ export default function TriageScreen() {
         }
         .drawer-row-id {
           font-family: var(--font-mono);
-          font-size: 0.7rem;
+          font-size: 0.72rem;
           color: var(--text-muted);
           font-variant-numeric: tabular-nums;
+          font-weight: 400;
         }
         .drawer-row-title {
-          font-size: 0.8rem;
+          font-size: 0.875rem;
+          font-weight: 400;
           color: var(--text-primary);
           overflow: hidden;
           text-overflow: ellipsis;
@@ -722,13 +752,14 @@ export default function TriageScreen() {
           margin-top: 2px;
         }
         .drawer-change-chip {
-          font-size: 0.6rem;
-          padding: 1px 4px;
-          border-radius: 2px;
-          background: rgba(94, 106, 210, 0.12);
+          font-size: 0.72rem;
+          padding: 1px 5px;
+          border-radius: var(--radius-sm);
+          background: rgba(94, 106, 210, 0.10);
           color: var(--accent);
           text-transform: uppercase;
           letter-spacing: 0.03em;
+          font-weight: 400;
         }
 
         /* Card stack — 3D perspective */
@@ -811,13 +842,96 @@ export default function TriageScreen() {
           100% { box-shadow: var(--shadow-card); border-color: var(--border-subtle); }
         }
 
+        /* Empty / inbox-zero state */
         .triage-empty {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: var(--sp-4);
-          margin-top: 30vh;
-          color: var(--text-secondary);
+          justify-content: center;
+          height: 100%;
+          gap: var(--sp-3);
+          position: relative;
+          z-index: 1;
+        }
+        .empty-icon {
+          color: var(--priority-low);
+          animation: empty-icon-enter 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes empty-icon-enter {
+          0% { opacity: 0; transform: scale(0.5); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+        .empty-checkmark .empty-circle {
+          stroke-dasharray: 165;
+          stroke-dashoffset: 165;
+          animation: empty-draw-circle 600ms ease-out 100ms forwards;
+        }
+        .empty-checkmark .empty-check {
+          stroke-dasharray: 44;
+          stroke-dashoffset: 44;
+          animation: empty-draw-check 400ms ease-out 500ms forwards;
+        }
+        @keyframes empty-draw-circle {
+          to { stroke-dashoffset: 0; }
+        }
+        @keyframes empty-draw-check {
+          to { stroke-dashoffset: 0; }
+        }
+        .empty-title {
+          font-size: 1.5rem;
+          font-weight: 300;
+          letter-spacing: -0.02em;
+          animation: empty-fade-up 400ms ease-out 300ms both;
+        }
+        .empty-subtitle {
+          font-size: 0.875rem;
+          font-weight: 400;
+          color: var(--text-muted);
+          animation: empty-fade-up 400ms ease-out 450ms both;
+        }
+        .empty-actions {
+          display: flex;
+          gap: var(--sp-3);
+          margin-top: var(--sp-2);
+          animation: empty-fade-up 400ms ease-out 600ms both;
+        }
+        .empty-actions a {
+          text-decoration: none;
+        }
+        @keyframes empty-fade-up {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Empty confetti */
+        .empty-confetti {
+          position: absolute;
+          inset: 0;
+          overflow: hidden;
+          pointer-events: none;
+          z-index: 0;
+        }
+        .empty-confetti-piece {
+          position: absolute;
+          top: -10px;
+          left: var(--x);
+          width: var(--size);
+          height: var(--size);
+          background: var(--color);
+          border-radius: 1px;
+          animation: empty-confetti-fall var(--duration) cubic-bezier(0.25, 0.46, 0.45, 0.94) var(--delay) forwards;
+          transform: rotate(var(--rotation));
+        }
+        @keyframes empty-confetti-fall {
+          0% {
+            opacity: 1;
+            transform: translateY(0) translateX(0) rotate(var(--rotation)) scale(1);
+          }
+          75% { opacity: 1; }
+          100% {
+            opacity: 0;
+            transform: translateY(100vh) translateX(var(--drift)) rotate(calc(var(--rotation) + 720deg)) scale(0.5);
+          }
         }
 
         /* Priority flash */
@@ -858,17 +972,106 @@ export default function TriageScreen() {
           padding: var(--sp-1) var(--sp-2);
         }
         .detail-title {
-          font-size: 1.35rem;
-          font-weight: 600;
-          line-height: 1.35;
+          font-size: 1.25rem;
+          font-weight: 400;
+          line-height: 1.4;
+          letter-spacing: -0.01em;
           margin-bottom: var(--sp-4);
         }
         .detail-description {
           color: var(--text-secondary);
-          font-size: 0.9rem;
+          font-size: 0.875rem;
           line-height: 1.6;
-          white-space: pre-wrap;
+          font-weight: 400;
           word-break: break-word;
+        }
+        .detail-description p {
+          margin: 0 0 0.6em;
+        }
+        .detail-description p:last-child {
+          margin-bottom: 0;
+        }
+        .detail-description h1,
+        .detail-description h2 {
+          font-size: 1rem;
+          font-weight: 500;
+          color: var(--text-primary);
+          margin: 1em 0 0.4em;
+        }
+        .detail-description h3,
+        .detail-description h4 {
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: var(--text-primary);
+          margin: 0.8em 0 0.3em;
+        }
+        .detail-description h1:first-child,
+        .detail-description h2:first-child,
+        .detail-description h3:first-child {
+          margin-top: 0;
+        }
+        .detail-description ul,
+        .detail-description ol {
+          padding-left: 1.4em;
+          margin: 0 0 0.6em;
+        }
+        .detail-description li {
+          margin-bottom: 0.2em;
+        }
+        .detail-description code {
+          font-family: var(--font-mono);
+          font-size: 0.85em;
+          background: var(--chip-bg);
+          padding: 2px 5px;
+          border-radius: var(--radius-sm);
+        }
+        .detail-description pre {
+          background: var(--chip-bg);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--radius-md);
+          padding: var(--sp-3);
+          overflow-x: auto;
+          margin: 0.6em 0;
+        }
+        .detail-description pre code {
+          background: none;
+          padding: 0;
+          font-size: 0.8rem;
+        }
+        .detail-description blockquote {
+          border-left: 3px solid var(--border-medium);
+          padding-left: var(--sp-3);
+          margin: 0.6em 0;
+          color: var(--text-muted);
+        }
+        .detail-description a {
+          color: var(--accent);
+        }
+        .detail-description img {
+          max-width: 100%;
+          border-radius: var(--radius-md);
+          margin: 0.4em 0;
+        }
+        .detail-description hr {
+          border: none;
+          border-top: 1px solid var(--border-subtle);
+          margin: 0.8em 0;
+        }
+        .detail-description table {
+          border-collapse: collapse;
+          width: 100%;
+          margin: 0.6em 0;
+          font-size: 0.85rem;
+        }
+        .detail-description th,
+        .detail-description td {
+          border: 1px solid var(--border-subtle);
+          padding: var(--sp-1) var(--sp-2);
+          text-align: left;
+        }
+        .detail-description th {
+          background: var(--chip-bg);
+          font-weight: 500;
         }
         .detail-footer {
           margin-top: var(--sp-5);

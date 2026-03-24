@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap');
 @import './tokens.css';
 
 *, *::before, *::after {
@@ -16,7 +16,9 @@ body {
   font-family: var(--font-sans);
   background: var(--bg-app);
   color: var(--text-primary);
-  line-height: 1.4;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -76,7 +78,7 @@ a:hover {
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
   padding: var(--sp-3) var(--sp-4);
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   color: var(--text-primary);
   animation: toast-in 200ms ease-out;
   max-width: 360px;
@@ -100,7 +102,7 @@ a:hover {
   border: 1px solid var(--border-light);
   border-radius: var(--radius-sm);
   padding: 2px 6px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   white-space: nowrap;

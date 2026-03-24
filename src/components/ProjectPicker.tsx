@@ -148,19 +148,21 @@ export default function ProjectPicker({ projects, currentProjectId, onSelect, on
         }
         .picker-item-name {
           flex: 1;
-          font-size: 0.85rem;
+          font-size: 0.875rem;
+          font-weight: 400;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
         }
         .picker-check {
           color: var(--accent);
-          font-size: 0.85rem;
+          font-size: 0.875rem;
           flex-shrink: 0;
         }
         .picker-empty {
           color: var(--text-muted);
-          font-size: 0.8rem;
+          font-size: 0.875rem;
+          font-weight: 400;
           text-align: center;
           padding: var(--sp-4);
         }

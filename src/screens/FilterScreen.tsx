@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useApp } from '../store/useAppStore'
+import AppHeader from '../components/AppHeader'
 import {
   fetchTeams, fetchTeamDetails, fetchIssues, fetchIssueCount,
   fetchViewerTeams, fetchAllTeamsData, logout,
@@ -214,14 +215,11 @@ export default function FilterScreen() {
       {/* Top bar */}
       <div className="filter-topbar">
         <div className="filter-topbar-left">
-          <p className="filter-mode-label">Filter Mode</p>
+          <AppHeader />
           <div className="filter-title-row">
             <h1 className="filter-title">
               {state.viewer?.name ? `Hey ${state.viewer.name.split(' ')[0]}` : 'Scope your triage'}
             </h1>
-            {state.organization && (
-              <span className="workspace-badge">{state.organization.name}</span>
-            )}
           </div>
         </div>
         <div className="filter-topbar-right">
@@ -350,7 +348,7 @@ export default function FilterScreen() {
         {showFilters && state.availableProjects.length > 0 && (
           <div className="filter-col filter-col-projects">
             <label className="filter-col-title">
-              Projects <span className="filter-label-hint">{state.filterConfig.projectIds.length === 0 ? 'all' : `${state.filterConfig.projectIds.length} selected`}</span>
+              Projects <span className="filter-label-hint">{state.filterConfig.projectIds.length === 0 ? `all ${state.availableProjects.length}` : `${state.filterConfig.projectIds.length} of ${state.availableProjects.length}`}</span>
             </label>
             {showProjectSearch && (
               <input
@@ -361,6 +359,17 @@ export default function FilterScreen() {
               />
             )}
             <div className="project-list">
+              <button
+                className={`team-item project-all-row ${state.filterConfig.projectIds.length === 0 ? 'team-item-active' : ''}`}
+                onClick={() => dispatch({ type: 'SET_FILTER', filterConfig: { projectIds: [] } })}
+              >
+                <span className={`chip-radio ${state.filterConfig.projectIds.length === 0 ? 'chip-radio-checked' : ''}`} />
+                <span className="team-item-name">All projects</span>
+                {state.filterConfig.projectIds.length === 0 && (
+                  <span className="project-all-badge">{state.availableProjects.length}</span>
+                )}
+              </button>
+              <div className="project-list-divider" />
               {filteredProjects.map(p => {
                 const isActive = state.filterConfig.projectIds.includes(p.id)
                 return (
@@ -451,32 +460,15 @@ export default function FilterScreen() {
         .filter-topbar-left {
           flex-shrink: 0;
         }
-        .filter-mode-label {
-          font-size: 0.6rem;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          color: var(--accent);
-          font-weight: 600;
-          margin-bottom: 1px;
-        }
         .filter-title-row {
           display: flex;
           align-items: center;
           gap: var(--sp-2);
         }
         .filter-title {
-          font-size: 1rem;
-          font-weight: 600;
-        }
-        .workspace-badge {
-          font-size: 0.65rem;
-          padding: 2px 7px;
-          border-radius: 10px;
-          background: var(--chip-bg);
-          border: 1px solid var(--border-light);
+          font-size: 0.875rem;
+          font-weight: 400;
           color: var(--text-secondary);
-          white-space: nowrap;
-          font-weight: 500;
         }
         .filter-topbar-right {
           display: flex;
@@ -490,15 +482,16 @@ export default function FilterScreen() {
           flex-wrap: wrap;
         }
         .filter-summary-tag {
-          font-size: 0.65rem;
-          padding: 1px 6px;
-          border-radius: 3px;
-          background: rgba(94, 106, 210, 0.12);
+          font-size: 0.72rem;
+          padding: 2px 7px;
+          border-radius: var(--radius-sm);
+          background: rgba(94, 106, 210, 0.10);
           color: var(--accent);
           white-space: nowrap;
+          font-weight: 400;
         }
         .filter-reset-btn {
-          font-size: 0.65rem;
+          font-size: 0.72rem;
           color: var(--text-muted);
           text-decoration: underline;
           padding: 0;
@@ -514,9 +507,10 @@ export default function FilterScreen() {
           flex-shrink: 0;
         }
         .filter-logout {
-          font-size: 0.72rem;
+          font-size: 0.75rem;
           padding: var(--sp-1) var(--sp-3);
           color: var(--text-muted);
+          font-weight: 400;
           flex-shrink: 0;
         }
         .filter-loading-small {
@@ -560,18 +554,20 @@ export default function FilterScreen() {
           display: flex;
           align-items: baseline;
           gap: var(--sp-2);
-          font-size: 0.68rem;
+          font-size: 0.72rem;
           text-transform: uppercase;
           letter-spacing: 0.05em;
           color: var(--text-muted);
+          font-weight: 500;
           margin-bottom: var(--sp-2);
           flex-shrink: 0;
         }
         .filter-label-hint {
-          font-size: 0.6rem;
+          font-size: 0.72rem;
           text-transform: none;
           letter-spacing: 0;
           color: var(--text-muted);
+          font-weight: 400;
           opacity: 0.6;
         }
         .filter-col-empty {
@@ -611,15 +607,16 @@ export default function FilterScreen() {
           gap: 0;
         }
         .mode-row-label {
-          font-size: 0.85rem;
-          font-weight: 500;
+          font-size: 0.875rem;
+          font-weight: 400;
         }
         .mode-row-active .mode-row-label {
           color: var(--accent);
         }
         .mode-row-desc {
-          font-size: 0.65rem;
+          font-size: 0.72rem;
           color: var(--text-muted);
+          font-weight: 400;
         }
 
         /* Shared list styles */
@@ -645,7 +642,8 @@ export default function FilterScreen() {
           background: rgba(94, 106, 210, 0.08);
         }
         .team-item-name {
-          font-size: 0.82rem;
+          font-size: 0.875rem;
+          font-weight: 400;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -689,6 +687,20 @@ export default function FilterScreen() {
           line-height: 1;
         }
 
+        .project-all-row {
+          font-weight: 400;
+        }
+        .project-all-badge {
+          font-size: 0.72rem;
+          color: var(--text-muted);
+          margin-left: auto;
+          font-variant-numeric: tabular-nums;
+        }
+        .project-list-divider {
+          height: 1px;
+          background: var(--border-subtle);
+          margin: var(--sp-1) var(--sp-3);
+        }
         .filter-project-search {
           margin-bottom: var(--sp-2);
           padding: var(--sp-1) var(--sp-2);

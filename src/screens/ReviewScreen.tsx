@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useApp, clearSession } from '../store/useAppStore'
+import AppHeader from '../components/AppHeader'
 import { updateIssue } from '../api/linear'
 import type { PendingChange } from '../api/types'
 
@@ -315,21 +316,14 @@ export default function ReviewScreen() {
   return (
     <div className="review-screen">
       <div className="review-header">
+        <AppHeader />
         <button
           className="btn-secondary"
           onClick={() => dispatch({ type: 'SET_SCREEN', screen: 'triage' })}
         >
           &larr; Back
         </button>
-        <div className="review-header-title">
-          <div className="review-mode-row">
-            <p className="review-mode-label">Review Mode</p>
-            {state.organization && (
-              <span className="workspace-badge">{state.organization.name}</span>
-            )}
-          </div>
-          <h2 className="review-heading">Review Changes</h2>
-        </div>
+        <h2 className="review-heading">Review Changes</h2>
       </div>
 
       <div className="review-layout">
@@ -419,34 +413,11 @@ const reviewStyles = `
     padding: var(--sp-3) var(--sp-4);
     border-bottom: 1px solid var(--border-subtle);
   }
-  .review-header-title {
-    flex: 1;
-  }
-  .review-mode-row {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-2);
-  }
-  .review-mode-label {
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--accent);
-    font-weight: 600;
-  }
-  .workspace-badge {
-    font-size: 0.6rem;
-    padding: 1px 6px;
-    border-radius: 10px;
-    background: var(--chip-bg);
-    border: 1px solid var(--border-light);
-    color: var(--text-secondary);
-    white-space: nowrap;
-    font-weight: 500;
-  }
   .review-heading {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    flex: 1;
   }
   .review-layout {
     flex: 1;
@@ -479,12 +450,13 @@ const reviewStyles = `
   }
   .review-stat-value {
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 300;
     font-variant-numeric: tabular-nums;
   }
   .review-stat-label {
-    font-size: 0.8rem;
+    font-size: 0.875rem;
     color: var(--text-muted);
+    font-weight: 400;
   }
   .review-breakdown {
     margin: var(--sp-3) 0;
@@ -492,8 +464,9 @@ const reviewStyles = `
     border-top: 1px solid var(--border-subtle);
   }
   .review-breakdown-item {
-    font-size: 0.8rem;
+    font-size: 0.875rem;
     color: var(--text-secondary);
+    font-weight: 400;
     padding: 2px 0;
   }
   .review-commit-btn {
@@ -533,12 +506,14 @@ const reviewStyles = `
   }
   .review-identifier {
     font-family: var(--font-mono);
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     color: var(--text-muted);
+    font-weight: 400;
     flex-shrink: 0;
   }
   .review-title {
-    font-size: 0.85rem;
+    font-size: 0.875rem;
+    font-weight: 400;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -552,7 +527,8 @@ const reviewStyles = `
     display: flex;
     align-items: center;
     gap: var(--sp-2);
-    font-size: 0.8rem;
+    font-size: 0.875rem;
+    font-weight: 400;
   }
   .review-field-name {
     color: var(--text-muted);
@@ -571,9 +547,10 @@ const reviewStyles = `
     font-weight: 500;
   }
   .review-label-change {
-    font-size: 0.8rem;
+    font-size: 0.875rem;
+    font-weight: 400;
     padding: 1px 5px;
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
   }
   .review-added {
     color: var(--priority-low);
@@ -623,8 +600,9 @@ const reviewStyles = `
     50% { opacity: 1; }
   }
   .review-progress-text {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: var(--text-muted);
+    font-weight: 400;
   }
 
   /* Done state */
@@ -676,8 +654,9 @@ const reviewStyles = `
     to { stroke-dashoffset: 0; }
   }
   .review-done-title {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-size: 1.5rem;
+    font-weight: 300;
+    letter-spacing: -0.02em;
     animation: fade-up 400ms ease-out 300ms both;
   }
   .done-stats {
@@ -692,13 +671,14 @@ const reviewStyles = `
   }
   .done-stat-value {
     font-size: 2rem;
-    font-weight: 700;
+    font-weight: 300;
     font-variant-numeric: tabular-nums;
     color: var(--accent);
   }
   .done-stat-label {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: var(--text-muted);
+    font-weight: 400;
     margin-top: 2px;
   }
   @keyframes fade-up {
@@ -707,7 +687,8 @@ const reviewStyles = `
   }
   .review-done-fail {
     color: var(--priority-urgent);
-    font-size: 0.85rem;
+    font-size: 0.875rem;
+    font-weight: 400;
     animation: fade-up 400ms ease-out 600ms both;
   }
   .review-done-actions {
