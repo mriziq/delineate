@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Markdown from 'react-markdown'
+import rehypeSanitize from 'rehype-sanitize'
 import { useApp } from '../store/useAppStore'
 import AppHeader from '../components/AppHeader'
 import IssueCard from '../components/IssueCard'
@@ -645,7 +646,7 @@ export default function WorkspaceScreen() {
               <button className="btn-secondary detail-close" onClick={() => dispatch({ type: 'CLOSE_OVERLAY' })}>Esc</button>
             </div>
             <h2 className="detail-title">{currentIssue!.title}</h2>
-            {currentIssue!.description && <div className="detail-description"><Markdown>{currentIssue!.description}</Markdown></div>}
+            {currentIssue!.description && <div className="detail-description"><Markdown rehypePlugins={[rehypeSanitize]}>{currentIssue!.description}</Markdown></div>}
             <div className="card-divider" style={{ margin: '16px 0' }} />
             <div className="card-fields">
               <div className={`card-field ${currentPending?.changes.priority !== undefined ? 'field-changed' : ''}`}>

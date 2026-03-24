@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/server.js": {
+      "includeFiles": "server.js"
+    }
+  },
+  "rewrites": [
+    { "source": "/auth/:path*", "destination": "/api/server" },
+    { "source": "/api/:path*", "destination": "/api/server" },
+    { "source": "/:path*", "destination": "/" }
+  ]
+}

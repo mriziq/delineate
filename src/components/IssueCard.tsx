@@ -1,4 +1,5 @@
 import Markdown from 'react-markdown'
+import rehypeSanitize from 'rehype-sanitize'
 import type { Issue, PendingChange, Label } from '../api/types'
 
 const PRIORITY_LABELS: Record<number, string> = {
@@ -70,7 +71,7 @@ export default function IssueCard({ issue, pending, availableLabels, onClick, co
 
       {!compact && issue.description && (
         <div className="card-description">
-          <Markdown>{issue.description.length > 300
+          <Markdown rehypePlugins={[rehypeSanitize]}>{issue.description.length > 300
             ? issue.description.slice(0, 300) + '...'
             : issue.description}</Markdown>
         </div>

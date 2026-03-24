@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import express from 'express'
 import cookieSession from 'cookie-session'
 import helmet from 'helmet'
@@ -18,8 +19,9 @@ const CLIENT_SECRET = process.env.LINEAR_CLIENT_SECRET
 const SESSION_SECRET = process.env.SESSION_SECRET
 
 if (!CLIENT_ID || !CLIENT_SECRET || !SESSION_SECRET) {
-  console.error('Missing required env vars: LINEAR_CLIENT_ID, LINEAR_CLIENT_SECRET, SESSION_SECRET')
-  process.exit(1)
+  const msg = 'Missing required env vars: LINEAR_CLIENT_ID, LINEAR_CLIENT_SECRET, SESSION_SECRET'
+  console.error(msg)
+  if (!process.env.VERCEL) process.exit(1)
 }
 
 // --- Security middleware ---
@@ -86,20 +88,30 @@ function getRedirectUri() {
 
 app.get('/auth/login', authLimiter, (req, res) => {
   const redirectUri = getRedirectUri()
+  const state = crypto.randomBytes(32).toString('hex')
+  req.session.oauthState = state
   const params = new URLSearchParams({
     client_id: CLIENT_ID,
     redirect_uri: redirectUri,
     response_type: 'code',
     scope: 'read,write',
     prompt: 'consent',
+    state,
   })
   res.redirect(`https://linear.app/oauth/authorize?${params}`)
 })
 
 app.get('/auth/callback', authLimiter, async (req, res) => {
-  const { code } = req.query
+  const { code, state } = req.query
   if (!code) {
     return res.status(400).send('Missing authorization code')
+  }
+
+  // Validate OAuth state to prevent CSRF
+  const expectedState = req.session.oauthState
+  req.session.oauthState = null // consume the state
+  if (!state || !expectedState || state !== expectedState) {
+    return res.status(403).send('Invalid OAuth state — possible CSRF attack')
   }
 
   try {
@@ -155,7 +167,7 @@ app.get('/auth/callback', authLimiter, async (req, res) => {
   }
 })
 
-app.get('/auth/me', (req, res) => {
+app.get('/auth/me', apiLimiter, (req, res) => {
   if (!req.session.accessToken) {
     return res.status(401).json({ error: 'Not authenticated' })
   }
@@ -198,15 +210,20 @@ app.post('/api/graphql', apiLimiter, async (req, res) => {
   }
 })
 
-// --- Static files (production) ---
+// --- Static files (production, non-Vercel) ---
 
-if (IS_PROD) {
+if (IS_PROD && !process.env.VERCEL) {
   app.use(express.static(join(__dirname, 'dist')))
   app.get('*', (req, res) => {
     res.sendFile(join(__dirname, 'dist', 'index.html'))
   })
 }
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`)
-})
+// Export for Vercel serverless; start server for local/traditional hosting
+export default app
+
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`)
+  })
+}
