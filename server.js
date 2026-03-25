@@ -14,6 +14,11 @@ const app = express()
 const PORT = process.env.PORT || 3000
 const IS_PROD = process.env.NODE_ENV === 'production'
 
+// Trust reverse proxies (Vercel, etc.) so secure cookies and req.protocol work correctly
+if (IS_PROD) {
+  app.set('trust proxy', 1)
+}
+
 const CLIENT_ID = process.env.LINEAR_CLIENT_ID
 const CLIENT_SECRET = process.env.LINEAR_CLIENT_SECRET
 const SESSION_SECRET = process.env.SESSION_SECRET
@@ -110,7 +115,6 @@ app.get('/auth/login', authLimiter, (req, res) => {
     redirect_uri: redirectUri,
     response_type: 'code',
     scope: 'read,write',
-    prompt: 'consent',
     state,
   })
   res.redirect(`https://linear.app/oauth/authorize?${params}`)
