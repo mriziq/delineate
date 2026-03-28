@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { DelineateLockup } from '../components/DelineateIcon'
 
 /* ─── GitHub stars ───────────────────────────────────── */
@@ -127,7 +127,7 @@ function GhostKeyDemo() {
   const [stepIdx, setStepIdx] = useState(0)
   const [phase, setPhase] = useState<'breathe' | 'fire' | 'badge' | 'submit'>('breathe')
   const [loopCount, setLoopCount] = useState(0)
-  const timer = useRef<ReturnType<typeof setTimeout>>()
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
     clearTimeout(timer.current)
@@ -429,6 +429,8 @@ export default function SetupScreen() {
             <a href="https://github.com/mriziq/delineate/issues" target="_blank" rel="noopener noreferrer">Issues</a>
             <span className="landing-dot" aria-hidden="true" />
             <span className="landing-muted">MIT License</span>
+            <span className="landing-dot" aria-hidden="true" />
+            <span className="landing-muted">Made by <a href="https://github.com/mriziq" target="_blank" rel="noopener noreferrer">@mriziq</a></span>
           </div>
         </footer>
       </div>

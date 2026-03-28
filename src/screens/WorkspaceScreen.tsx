@@ -667,6 +667,7 @@ export default function WorkspaceScreen() {
                       cardKey={cardKey}
                       position={ghostKeyPosition}
                       steps={ghostSteps}
+                      opacity={ghostOpacity}
                     />
                   )}
                   {nextNextIssue && <div className={`stack-card stack-card-2 ${cascadePhase === 'cascading' ? 'cascade-2' : ''}`} />}
