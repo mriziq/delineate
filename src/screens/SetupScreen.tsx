@@ -416,8 +416,6 @@ export default function SetupScreen() {
           </div>
           <p className="landing-disclaimer">
             Delineate is an independent open source project and is not affiliated with, endorsed by, or sponsored by Linear.
-            Built out of love for Linear and how good it already is. I use it every day and built this because I wanted
-            to keep using it even faster.
           </p>
         </div>
 
