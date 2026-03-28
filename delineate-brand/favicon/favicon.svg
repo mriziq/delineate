@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <style>
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #1a1a1e; }
+      .card-far { stroke: #2e2e36; }
+      .card-mid { stroke: #3a3a44; }
+      .card-top { fill: #F4F5F8; stroke: #F4F5F8; }
+      .card-lines { stroke: #222326; }
+    }
+    @media (prefers-color-scheme: light) {
+      .bg { fill: #F4F5F8; }
+      .card-far { stroke: #c8c8d0; }
+      .card-mid { stroke: #b8b8c4; }
+      .card-top { fill: #222326; stroke: #222326; }
+      .card-lines { stroke: #F4F5F8; }
+    }
+  </style>
+  <rect width="32" height="32" rx="6" class="bg"/>
+  <g transform="rotate(-28, 16, 21)">
+    <rect x="8" y="7" width="16" height="20" rx="2" class="card-far" stroke-width="1.2" fill="none"/>
+  </g>
+  <g transform="rotate(-14, 16, 21)">
+    <rect x="8" y="6" width="16" height="20" rx="2" class="card-mid" stroke-width="1.2" fill="none"/>
+  </g>
+  <g transform="rotate(14, 16, 21)">
+    <rect x="8" y="6" width="16" height="20" rx="2" class="card-mid" stroke-width="1.2" fill="none"/>
+  </g>
+  <g transform="rotate(28, 16, 21)">
+    <rect x="8" y="7" width="16" height="20" rx="2" class="card-far" stroke-width="1.2" fill="none"/>
+  </g>
+  <rect x="8" y="5" width="16" height="20" rx="2" class="card-top" stroke-width="1.2"/>
+  <line x1="11.5" y1="11" x2="20.5" y2="11" class="card-lines" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="11.5" y1="15" x2="18.5" y2="15" class="card-lines" stroke-width="1.2" stroke-linecap="round"/>
+</svg>
