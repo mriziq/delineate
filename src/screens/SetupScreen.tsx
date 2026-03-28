@@ -1030,12 +1030,13 @@ export default function SetupScreen() {
           max-width: 480px;
         }
 
-        /* ── Mobile ─────────────────────────────────── */
+        /* ── Tablet ─────────────────────────────────── */
         @media (max-width: 700px) {
           .landing-hero {
             grid-template-columns: 1fr;
             text-align: center;
             gap: var(--sp-6);
+            padding-top: min(6vh, 40px);
           }
           .landing-hero-left {
             align-items: center;
@@ -1060,6 +1061,73 @@ export default function SetupScreen() {
           }
           .gh-label {
             display: none;
+          }
+        }
+
+        /* ── Small mobile ──────────────────────────────── */
+        @media (max-width: 480px) {
+          .landing-nav {
+            gap: var(--sp-2);
+          }
+          .landing-nav-right {
+            gap: var(--sp-2);
+          }
+          .landing-signin {
+            padding: 6px var(--sp-3);
+            font-size: 0.75rem;
+          }
+          .landing-signin .linear-logo {
+            display: none;
+          }
+          .gh-btn {
+            padding: 5px 8px;
+          }
+          .gh-stars {
+            display: none;
+          }
+          .landing-hero {
+            padding-top: var(--sp-5);
+          }
+          .landing-headline {
+            font-size: 1.5rem;
+          }
+          .landing-sub {
+            font-size: 0.8125rem;
+          }
+          .demo-card-area {
+            width: 240px;
+          }
+          .demo-kbd {
+            font-size: 0.875rem;
+            min-width: 40px;
+            height: 40px;
+          }
+          .demo-key-wide .demo-kbd {
+            min-width: 74px;
+            padding: 0 12px;
+            font-size: 0.8125rem;
+          }
+          .landing-sass-title {
+            font-size: 1rem;
+          }
+          .landing-sass-body {
+            font-size: 0.8125rem;
+          }
+          .landing-features {
+            grid-template-columns: 1fr;
+            gap: var(--sp-5);
+          }
+          .landing-oss-details {
+            grid-template-columns: 1fr;
+            gap: var(--sp-3);
+          }
+          .landing-footer-links {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: var(--sp-2);
+          }
+          .landing-disclaimer {
+            text-align: center;
           }
         }
       `}</style>
