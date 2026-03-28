@@ -316,9 +316,10 @@ export default function SetupScreen() {
               Triage your backlog<br />in&nbsp;minutes, not&nbsp;hours
             </h1>
             <p className="landing-sub">
-              Swipe-card triage for Linear. Inspired by mobile dating apps
-              and inbox-zero gamification. Fly through issues with your keyboard,
-              tag each one in seconds, and hit zero.
+              Guitar Hero meets Linear meets Inbox Zero. Issues come at you
+              one by one, you nail each with a keystroke, and you don't stop
+              until you've cleared the queue. Fly through issues with your
+              keyboard, tag each one in seconds, and hit zero.
             </p>
             <a href="/auth/login" className="btn-primary landing-cta">
               Get Started
