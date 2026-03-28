@@ -1,0 +1,148 @@
+/* ============================================================
+   DELINEATE — DESIGN TOKENS
+   Import this file first in your CSS/SCSS entry point.
+   All values match Linear's exact design palette.
+   ============================================================ */
+
+:root {
+  /* ── Brand Colors ─────────────────────────────────────── */
+
+  /* Linear official brand colors */
+  --color-nordic-gray:     #222326;   /* Linear's dark brand color */
+  --color-mercury-white:   #F4F5F8;   /* Linear's light brand color */
+
+  /* App surfaces */
+  --color-bg:              #1a1a1e;   /* page background */
+  --color-surface:         #222326;   /* cards, panels */
+  --color-surface-raised:  #2a2a2e;   /* modals, overlays */
+  --color-surface-sunken:  #141416;   /* inset areas */
+
+  /* Borders */
+  --color-border:          rgba(255, 255, 255, 0.07);
+  --color-border-hover:    rgba(255, 255, 255, 0.12);
+  --color-border-focus:    #5e6ad2;
+
+  /* Text */
+  --color-text-primary:    #F4F5F8;
+  --color-text-secondary:  #9a9aaa;
+  --color-text-tertiary:   #6b6b78;
+  --color-text-disabled:   #3e3e48;
+
+  /* Accent — Linear violet */
+  --color-accent:          #5e6ad2;
+  --color-accent-hover:    #6b78e0;
+  --color-accent-muted:    rgba(94, 106, 210, 0.15);
+
+  /* Priority */
+  --color-priority-urgent: #eb5757;
+  --color-priority-high:   #f2994a;
+  --color-priority-medium: #f2c94c;
+  --color-priority-low:    #4cb782;
+  --color-priority-none:   #6b7280;
+
+  /* ── Typography ──────────────────────────────────────── */
+  --font-sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  --text-xs:      0.72rem;   /* 11.5px — labels, meta */
+  --text-sm:      0.8rem;    /* 12.8px — secondary body */
+  --text-base:    0.875rem;  /* 14px   — primary body */
+  --text-md:      1rem;      /* 16px   — card titles */
+  --text-lg:      1.125rem;  /* 18px   — section heads */
+  --text-xl:      1.5rem;    /* 24px   — screen titles */
+
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-light:   300;
+
+  --leading-tight:  1.3;
+  --leading-normal: 1.5;
+
+  /* ── Spacing (8px base grid) ──────────────────────────── */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Radius ───────────────────────────────────────────── */
+  --radius-sm:  4px;   /* chips, badges */
+  --radius-md:  6px;   /* cards, inputs, buttons */
+  --radius-lg:  8px;   /* modals, overlays */
+
+  /* ── Transitions ──────────────────────────────────────── */
+  --transition-fast:   150ms ease;
+  --transition-base:   200ms ease;
+  --transition-slow:   300ms ease;
+
+  /* ── Shadows ──────────────────────────────────────────── */
+  /* Linear uses minimal shadows — prefer border + bg elevation */
+  --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md:  0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg:  0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* Light mode overrides */
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-bg:             #F4F5F8;
+    --color-surface:        #ffffff;
+    --color-surface-raised: #f0f0f4;
+    --color-surface-sunken: #e8e8ec;
+
+    --color-border:         rgba(0, 0, 0, 0.07);
+    --color-border-hover:   rgba(0, 0, 0, 0.12);
+
+    --color-text-primary:   #222326;
+    --color-text-secondary: #5a5a68;
+    --color-text-tertiary:  #8a8a98;
+    --color-text-disabled:  #c0c0cc;
+
+    --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.08);
+    --shadow-md:  0 4px 12px rgba(0, 0, 0, 0.12);
+    --shadow-lg:  0 8px 24px rgba(0, 0, 0, 0.16);
+  }
+}
+
+/* ── Utility classes ──────────────────────────────────────── */
+
+.priority-urgent { color: var(--color-priority-urgent); }
+.priority-high   { color: var(--color-priority-high);   }
+.priority-medium { color: var(--color-priority-medium); }
+.priority-low    { color: var(--color-priority-low);    }
+.priority-none   { color: var(--color-priority-none);   }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.key-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  min-width: 22px;
+  text-align: center;
+}
