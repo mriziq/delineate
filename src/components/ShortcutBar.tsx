@@ -165,8 +165,8 @@ export default function ShortcutBar({ activeOverlay }: Props) {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: var(--sp-3);
-          padding: var(--sp-2) var(--sp-4);
+          gap: var(--sp-4);
+          padding: var(--sp-3) var(--sp-4);
           z-index: 50;
           transform: translateY(100%);
           opacity: 0;
@@ -183,7 +183,7 @@ export default function ShortcutBar({ activeOverlay }: Props) {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 3px;
+          gap: 8px;
         }
         .shortcut-close {
           position: absolute;
@@ -205,12 +205,12 @@ export default function ShortcutBar({ activeOverlay }: Props) {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: var(--sp-1);
+          gap: var(--sp-2);
         }
         .shortcut-group {
           display: flex;
           align-items: center;
-          gap: var(--sp-2);
+          gap: var(--sp-3);
         }
         .shortcut-group-label {
           font-size: 0.65rem;
@@ -225,13 +225,13 @@ export default function ShortcutBar({ activeOverlay }: Props) {
           width: 1px;
           height: 14px;
           background: var(--border-subtle);
-          margin: 0 var(--sp-2);
+          margin: 0 var(--sp-3);
           flex-shrink: 0;
         }
         .shortcut-item {
           display: flex;
           align-items: center;
-          gap: 3px;
+          gap: 5px;
           transition: opacity 150ms;
         }
         .shortcut-inactive {

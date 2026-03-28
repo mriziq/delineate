@@ -1,6 +1,7 @@
 import Markdown from 'react-markdown'
 import rehypeSanitize from 'rehype-sanitize'
 import type { Issue, PendingChange, Label } from '../api/types'
+import StateIcon from './StateIcon'
 
 const PRIORITY_LABELS: Record<number, string> = {
   0: 'No priority',
@@ -61,8 +62,8 @@ export default function IssueCard({ issue, pending, availableLabels, onClick, co
       {/* Header: identifier left, status right */}
       <div className="card-header">
         <span className="card-identifier">{issue.identifier}</span>
-        <span className="card-chip card-status-chip">
-          <span className="dot" style={{ background: issue.state.color }} />
+        <span className="card-chip card-status-pill" style={{ borderColor: issue.state.color }}>
+          <StateIcon type={issue.state.type} color={issue.state.color} size={12} />
           {issue.state.name}
         </span>
       </div>
@@ -128,6 +129,12 @@ export default function IssueCard({ issue, pending, availableLabels, onClick, co
       {(issue.project || projectChanged) && (
         <div className="card-project-row">
           <span className="card-chip card-project-chip">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+              <path d="M8 1.5L14 5v6l-6 3.5L2 11V5L8 1.5z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+              <path d="M8 8.5L2 5" stroke="currentColor" strokeWidth="1.2" />
+              <path d="M8 8.5l6-3.5" stroke="currentColor" strokeWidth="1.2" />
+              <path d="M8 8.5V15" stroke="currentColor" strokeWidth="1.2" />
+            </svg>
             {issue.project?.name || 'No project'}
             {projectChanged && <span className="card-project-changed">(changed)</span>}
           </span>
@@ -136,10 +143,6 @@ export default function IssueCard({ issue, pending, availableLabels, onClick, co
 
       {hasChanges && (
         <div className="card-changed-badge">Modified — press Z to undo</div>
-      )}
-
-      {onClick && (
-        <div className="card-expand-hint">Click to expand</div>
       )}
 
       <style>{`
@@ -199,7 +202,7 @@ export default function IssueCard({ issue, pending, availableLabels, onClick, co
           font-weight: 400;
           line-height: 1.4;
           letter-spacing: -0.01em;
-          margin-bottom: var(--sp-2);
+          margin-bottom: var(--sp-4);
         }
         .card-description {
           color: var(--text-secondary);
@@ -299,15 +302,13 @@ export default function IssueCard({ issue, pending, availableLabels, onClick, co
           white-space: nowrap;
           font-weight: 400;
         }
-        .card-chip .dot {
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          flex-shrink: 0;
-        }
-        .card-status-chip {
+        .card-status-pill {
           font-size: 0.72rem;
-          padding: 2px 8px;
+          padding: 2px 10px;
+          border-radius: 999px;
+          border-width: 1.5px;
+          border-style: solid;
+          background: transparent;
         }
         .label-chip {
           font-weight: 400;
@@ -323,6 +324,9 @@ export default function IssueCard({ issue, pending, availableLabels, onClick, co
           background: var(--chip-bg);
           color: var(--text-secondary);
           font-weight: 400;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
         }
         .card-project-changed {
           font-size: 0.72rem;
@@ -337,19 +341,6 @@ export default function IssueCard({ issue, pending, availableLabels, onClick, co
           color: var(--accent);
           text-align: center;
           font-weight: 400;
-        }
-        .card-expand-hint {
-          position: absolute;
-          top: var(--sp-2);
-          right: var(--sp-3);
-          font-size: 0.72rem;
-          color: var(--text-muted);
-          font-weight: 400;
-          opacity: 0;
-          transition: opacity 150ms;
-        }
-        .issue-card-clickable:hover .card-expand-hint {
-          opacity: 1;
         }
       `}</style>
     </div>

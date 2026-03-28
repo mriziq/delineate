@@ -89,10 +89,11 @@ export default function ProjectPicker({ projects, currentProjectId, onSelect, on
                       <rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="1.2" strokeDasharray="2 2" />
                     </svg>
                   ) : (
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                      <rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="1.2" />
-                      <rect x="4" y="4" width="6" height="2" rx="0.5" fill="currentColor" opacity="0.5" />
-                      <rect x="4" y="8" width="4" height="2" rx="0.5" fill="currentColor" opacity="0.3" />
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                      <path d="M8 1.5L14 5v6l-6 3.5L2 11V5L8 1.5z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+                      <path d="M8 8.5L2 5" stroke="currentColor" strokeWidth="1.2" />
+                      <path d="M8 8.5l6-3.5" stroke="currentColor" strokeWidth="1.2" />
+                      <path d="M8 8.5V15" stroke="currentColor" strokeWidth="1.2" />
                     </svg>
                   )}
                 </span>

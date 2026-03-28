@@ -26,7 +26,7 @@ const SECTIONS = [
       { keys: ['L'], desc: 'Label picker' },
       { keys: ['A'], desc: 'Assignee picker' },
       { keys: ['P'], desc: 'Project picker' },
-      { keys: ['0', 'Click'], desc: 'Expand issue detail' },
+      { keys: ['O', 'Click'], desc: 'Expand issue detail' },
     ],
   },
   {

@@ -10,11 +10,16 @@ import LabelPicker from '../components/LabelPicker'
 import AssigneePicker from '../components/AssigneePicker'
 import ProjectPicker from '../components/ProjectPicker'
 import CheatsheetModal from '../components/CheatsheetModal'
+import GhostKeyHints from '../components/GhostKeyHints'
+import GhostKeyConfigModal from '../components/GhostKeyConfigModal'
+import TriageCountdown from '../components/TriageCountdown'
+import StateIcon from '../components/StateIcon'
 import {
   fetchTeams, fetchTeamDetails, fetchIssues, fetchIssueCount,
   fetchViewerTeams, fetchAllTeamsData, logout,
 } from '../api/linear'
-import type { FilterConfig } from '../api/types'
+import type { FilterConfig, GhostKeyPosition, GhostStepConfig } from '../api/types'
+import { DEFAULT_GHOST_STEPS } from '../api/types'
 
 // ── Shared constants ─────────────────────────────────────
 const PRIORITY_FLASH_COLORS: Record<number, string> = {
@@ -58,7 +63,7 @@ export default function WorkspaceScreen() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [filtersLocked, setFiltersLocked] = useState(issues.length > 0)
   const [issuesLoaded, setIssuesLoaded] = useState(issues.length > 0)
-  type CascadePhase = 'idle' | 'loading' | 'cascading' | 'active'
+  type CascadePhase = 'idle' | 'loading' | 'cascading' | 'countdown' | 'active'
   const [cascadePhase, setCascadePhase] = useState<CascadePhase>(issues.length > 0 ? 'active' : 'idle')
 
   // ── Triage card state ──────────────────────────────────
@@ -74,6 +79,18 @@ export default function WorkspaceScreen() {
   const flashCounter = useRef(0)
 
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [ghostKeyPosition, setGhostKeyPosition] = useState<GhostKeyPosition>(
+    () => (localStorage.getItem('ghostKeyPosition') as GhostKeyPosition) || 'overlay'
+  )
+  const [ghostSteps, setGhostSteps] = useState<GhostStepConfig[]>(() => {
+    try {
+      const saved = localStorage.getItem('ghostSteps')
+      return saved ? JSON.parse(saved) : DEFAULT_GHOST_STEPS
+    } catch { return DEFAULT_GHOST_STEPS }
+  })
+  const [ghostOpacity, setGhostOpacity] = useState<number>(
+    () => Number(localStorage.getItem('ghostOpacity')) || 65
+  )
   const [reviewBounce, setReviewBounce] = useState(0)
   const prevPendingCount = useRef(pendingChanges.length)
 
@@ -161,7 +178,7 @@ export default function WorkspaceScreen() {
       setFiltersLocked(true)
       if (fetched.length > 0) {
         setCascadePhase('cascading')
-        setTimeout(() => setCascadePhase('active'), 700)
+        setTimeout(() => setCascadePhase('countdown'), 700)
       } else {
         setCascadePhase('active')
       }
@@ -277,7 +294,7 @@ export default function WorkspaceScreen() {
       exitTimer.current = setTimeout(() => { setExiting(null); dispatch({ type: 'GO_BACK' }) }, 280)
       return
     }
-    if (key === '0') {
+    if (key === 'o' || key === 'O') {
       if (activeOverlay === 'detail') dispatch({ type: 'CLOSE_OVERLAY' })
       else dispatch({ type: 'OPEN_OVERLAY', overlay: 'detail' })
       return
@@ -310,7 +327,7 @@ export default function WorkspaceScreen() {
     function handleSidebarKey(e: KeyboardEvent) {
       const tag = (e.target as HTMLElement)?.tagName
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
-      if (e.key === '[' && filtersLocked) setSidebarOpen(o => !o)
+      if (e.key === '[' && filtersLocked && !triageActive) setSidebarOpen(o => !o)
     }
     document.addEventListener('keydown', handleSidebarKey)
     return () => document.removeEventListener('keydown', handleSidebarKey)
@@ -325,7 +342,7 @@ export default function WorkspaceScreen() {
   // ── Derived ────────────────────────────────────────────
   const changesWithContent = pendingChanges.filter(pc => Object.keys(pc.changes).length > 0)
   const scopeLabel = filterConfig.mode === 'my-issues' ? 'My Issues' : selectedTeam ? selectedTeam.name : 'Team'
-  const stateLabels = filterConfig.states.map(s => s.charAt(0).toUpperCase() + s.slice(1))
+  const stateLabels = filterConfig.states.map(s => s === 'unstarted' ? 'Not Started' : s.charAt(0).toUpperCase() + s.slice(1))
   const nextIssue = issues[currentIndex + 1]
   const nextNextIssue = issues[currentIndex + 2]
 
@@ -352,6 +369,9 @@ export default function WorkspaceScreen() {
         <div className="ws-header-left">
           <AppHeader />
           {state.viewer?.name && <span className="ws-greeting">Hey {state.viewer.name.split(' ')[0]}</span>}
+          {triageActive && (
+            <button className="btn-secondary ws-change-filters-btn" onClick={handleUnlockFilters}>Change Filters</button>
+          )}
         </div>
         <div className="ws-header-center">
           {triageActive && (
@@ -365,7 +385,12 @@ export default function WorkspaceScreen() {
         <div className="ws-header-right">
           {triageActive && (
             <>
-              <span className="ws-counter">{currentIndex + 1} / {issues.length}</span>
+              <div className="ws-progress">
+                <div className="ws-progress-bar">
+                  <div className="ws-progress-fill" style={{ width: `${((currentIndex + 1) / issues.length) * 100}%` }} />
+                </div>
+                <span className="ws-progress-label">{currentIndex + 1}/{issues.length}</span>
+              </div>
               <button
                 className={`btn-secondary ws-review-btn ${drawerOpen ? 'ws-review-btn-active' : ''}`}
                 onClick={() => setDrawerOpen(o => !o)}
@@ -377,6 +402,11 @@ export default function WorkspaceScreen() {
               </button>
             </>
           )}
+          {triageActive && (
+            <button className="btn-secondary ws-ghost-config" onClick={() => dispatch({ type: 'OPEN_OVERLAY', overlay: 'ghost-config' })} title="Ghost key settings">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+          )}
           <button className="btn-secondary ws-logout" onClick={async () => { await logout(); dispatch({ type: 'SET_SCREEN', screen: 'setup' }) }}>
             Disconnect
           </button>
@@ -385,8 +415,8 @@ export default function WorkspaceScreen() {
 
       {/* ── Body: sidebar + main ────────────────────────── */}
       <div className="ws-body">
-        {/* Sidebar */}
-        <div className={`ws-sidebar ${sidebarOpen ? '' : 'ws-sidebar-collapsed'} ${filtersLocked ? 'ws-sidebar-locked' : ''}`}>
+        {/* Sidebar — hidden during triage */}
+        <div className={`ws-sidebar ${triageActive ? 'ws-sidebar-collapsed' : sidebarOpen ? '' : 'ws-sidebar-collapsed'} ${filtersLocked ? 'ws-sidebar-locked' : ''}`}>
           <div className="ws-sidebar-content">
             {loadingTeam && <p className="ws-sidebar-loading">Loading{mode === 'my-issues' ? ' teams' : ' team'}...</p>}
 
@@ -456,7 +486,7 @@ export default function WorkspaceScreen() {
                     return (
                       <button key={s} className={`sb-item ${isActive ? 'sb-item-active' : ''}`} onClick={() => !filtersLocked && toggleState(s)}>
                         <span className={`chip-checkbox ${isActive ? 'chip-checkbox-checked' : ''}`}>{isActive && <span className="chip-check-icon">&#10003;</span>}</span>
-                        <span className="sb-item-name">{s.charAt(0).toUpperCase() + s.slice(1)}</span>
+                        <span className="sb-item-name">{s === 'unstarted' ? 'Not Started' : s.charAt(0).toUpperCase() + s.slice(1)}</span>
                       </button>
                     )
                   })}
@@ -521,8 +551,8 @@ export default function WorkspaceScreen() {
           </div>
         </div>
 
-        {/* Sidebar collapse tab (visible when collapsed) */}
-        {!sidebarOpen && filtersLocked && (
+        {/* Sidebar collapse tab (visible when collapsed, hidden during triage) */}
+        {!triageActive && !sidebarOpen && filtersLocked && (
           <button className="ws-sidebar-tab" onClick={() => setSidebarOpen(true)} aria-label="Show filters">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M6 4l4 4-4 4"/></svg>
           </button>
@@ -530,11 +560,38 @@ export default function WorkspaceScreen() {
 
         {/* ── Main area ─────────────────────────────────── */}
         <div className="ws-main">
-          {/* Before issues loaded: prompt */}
+          {/* Before issues loaded: gamified prompt */}
           {!issuesLoaded && cascadePhase !== 'loading' && (
             <div className="ws-prompt">
-              <h2 className="ws-prompt-title">Configure your filters</h2>
-              <p className="ws-prompt-desc">Select a source, workflow state, and optionally narrow by project — then start triaging.</p>
+              <div className="ws-prompt-radar">
+                <div className="radar-ring radar-ring-1" />
+                <div className="radar-ring radar-ring-2" />
+                <div className="radar-ring radar-ring-3" />
+                <div className="radar-sweep" />
+                <div className="radar-center">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                </div>
+              </div>
+              <h2 className="ws-prompt-title">Waiting for your signal</h2>
+              <p className="ws-prompt-desc">
+                Pick your filters to lock on — issues are out there waiting to be triaged.
+              </p>
+              <div className="ws-prompt-hints">
+                <span className="ws-hint ws-hint-1">
+                  <span className="ws-hint-dot" />Team
+                </span>
+                <span className="ws-hint-arrow">→</span>
+                <span className="ws-hint ws-hint-2">
+                  <span className="ws-hint-dot" />State
+                </span>
+                <span className="ws-hint-arrow">→</span>
+                <span className="ws-hint ws-hint-3">
+                  <span className="ws-hint-dot" />Go
+                </span>
+              </div>
             </div>
           )}
 
@@ -579,21 +636,70 @@ export default function WorkspaceScreen() {
           {/* Card stack (triage mode) */}
           {issuesLoaded && issues.length > 0 && currentIssue && (
             <div className={`ws-card-area ${drawerOpen ? 'ws-card-area-shifted' : ''} ${cascadePhase === 'cascading' ? 'ws-card-area-entering' : ''}`}>
-              <div className="card-stack">
-                {nextNextIssue && <div className={`stack-card stack-card-2 ${cascadePhase === 'cascading' ? 'cascade-2' : ''}`} />}
-                {nextIssue && <div className={`stack-card stack-card-1 ${cascadePhase === 'cascading' ? 'cascade-1' : ''}`} />}
-                <div
-                  key={cardKey}
-                  className={`triage-card-wrapper ${
-                    cascadePhase === 'cascading' ? 'cascade-top' :
-                    exiting === 'right' ? 'card-exit-right' :
-                    exiting === 'left' ? 'card-exit-left' :
-                    exiting === 'submit' ? 'card-submit-glow' :
-                    enterFrom === 'right' ? 'card-enter-right' : 'card-enter-left'
-                  }`}
-                >
-                  <IssueCard issue={currentIssue} pending={currentPending} availableLabels={availableLabels} onClick={() => dispatch({ type: 'OPEN_OVERLAY', overlay: 'detail' })} />
+              <div className="card-column">
+                {triageActive && ghostKeyPosition === 'above' && (
+                  <GhostKeyHints
+                    pending={{
+                      priority: currentPending?.changes.priority !== undefined,
+                      estimate: currentPending?.changes.estimate !== undefined,
+                      labelIds: currentPending?.changes.labelIds !== undefined,
+                      assigneeId: currentPending?.changes.assigneeId !== undefined,
+                      projectId: currentPending?.changes.projectId !== undefined,
+                    }}
+                    overlayOpen={activeOverlay !== null}
+                    cardKey={cardKey}
+                    position={ghostKeyPosition}
+                    steps={ghostSteps}
+                    opacity={ghostOpacity}
+                  />
+                )}
+                <div className="card-stack" style={{ position: 'relative' }}>
+                  {triageActive && ghostKeyPosition === 'overlay' && (
+                    <GhostKeyHints
+                      pending={{
+                        priority: currentPending?.changes.priority !== undefined,
+                        estimate: currentPending?.changes.estimate !== undefined,
+                        labelIds: currentPending?.changes.labelIds !== undefined,
+                        assigneeId: currentPending?.changes.assigneeId !== undefined,
+                        projectId: currentPending?.changes.projectId !== undefined,
+                      }}
+                      overlayOpen={activeOverlay !== null}
+                      cardKey={cardKey}
+                      position={ghostKeyPosition}
+                      steps={ghostSteps}
+                    />
+                  )}
+                  {nextNextIssue && <div className={`stack-card stack-card-2 ${cascadePhase === 'cascading' ? 'cascade-2' : ''}`} />}
+                  {nextIssue && <div className={`stack-card stack-card-1 ${cascadePhase === 'cascading' ? 'cascade-1' : ''}`} />}
+                  <div
+                    key={cardKey}
+                    className={`triage-card-wrapper ${
+                      cascadePhase === 'cascading' ? 'cascade-top' :
+                      exiting === 'right' ? 'card-exit-right' :
+                      exiting === 'left' ? 'card-exit-left' :
+                      exiting === 'submit' ? 'card-submit-glow' :
+                      enterFrom === 'right' ? 'card-enter-right' : 'card-enter-left'
+                    }`}
+                  >
+                    <IssueCard issue={currentIssue} pending={currentPending} availableLabels={availableLabels} onClick={() => dispatch({ type: 'OPEN_OVERLAY', overlay: 'detail' })} />
+                  </div>
                 </div>
+                {triageActive && ghostKeyPosition === 'below' && (
+                  <GhostKeyHints
+                    pending={{
+                      priority: currentPending?.changes.priority !== undefined,
+                      estimate: currentPending?.changes.estimate !== undefined,
+                      labelIds: currentPending?.changes.labelIds !== undefined,
+                      assigneeId: currentPending?.changes.assigneeId !== undefined,
+                      projectId: currentPending?.changes.projectId !== undefined,
+                    }}
+                    overlayOpen={activeOverlay !== null}
+                    cardKey={cardKey}
+                    position={ghostKeyPosition}
+                    steps={ghostSteps}
+                    opacity={ghostOpacity}
+                  />
+                )}
               </div>
             </div>
           )}
@@ -633,6 +739,11 @@ export default function WorkspaceScreen() {
         </div>
       </div>
 
+      {/* ── Countdown overlay ─────────────────────────── */}
+      {cascadePhase === 'countdown' && (
+        <TriageCountdown onComplete={() => setCascadePhase('active')} />
+      )}
+
       {/* ── Overlays ────────────────────────────────────── */}
       {triageActive && activeOverlay === 'detail' && (
         <div className="overlay-backdrop" onClick={() => dispatch({ type: 'CLOSE_OVERLAY' })}>
@@ -641,7 +752,7 @@ export default function WorkspaceScreen() {
               <div>
                 <span className="card-identifier">{currentIssue!.identifier}</span>
                 {currentIssue!.project && <span className="chip" style={{ marginLeft: 8 }}>{currentIssue!.project.name}</span>}
-                <span className="chip" style={{ marginLeft: 4 }}><span className="dot" style={{ background: currentIssue!.state.color }} />{currentIssue!.state.name}</span>
+                <span className="chip state-pill" style={{ marginLeft: 4, borderColor: currentIssue!.state.color }}><StateIcon type={currentIssue!.state.type} color={currentIssue!.state.color} size={12} />{currentIssue!.state.name}</span>
               </div>
               <button className="btn-secondary detail-close" onClick={() => dispatch({ type: 'CLOSE_OVERLAY' })}>Esc</button>
             </div>
@@ -691,7 +802,17 @@ export default function WorkspaceScreen() {
         <ProjectPicker projects={availableProjects} currentProjectId={getCurrentProjectId()} onSelect={id => { dispatch({ type: 'APPLY_CHANGE', issueId: currentIssue!.id, field: 'projectId', value: id }); dispatch({ type: 'CLOSE_OVERLAY' }) }} onClose={() => dispatch({ type: 'CLOSE_OVERLAY' })} />
       )}
       {triageActive && activeOverlay === 'cheatsheet' && <CheatsheetModal onClose={() => dispatch({ type: 'CLOSE_OVERLAY' })} />}
-
+      {triageActive && activeOverlay === 'ghost-config' && (
+        <GhostKeyConfigModal
+          position={ghostKeyPosition}
+          steps={ghostSteps}
+          opacity={ghostOpacity}
+          onPositionChange={pos => { setGhostKeyPosition(pos); localStorage.setItem('ghostKeyPosition', pos) }}
+          onStepsChange={s => { setGhostSteps(s); localStorage.setItem('ghostSteps', JSON.stringify(s)) }}
+          onOpacityChange={v => { setGhostOpacity(v); localStorage.setItem('ghostOpacity', String(v)) }}
+          onClose={() => dispatch({ type: 'CLOSE_OVERLAY' })}
+        />
+      )}
       {triageActive && <ShortcutBar activeOverlay={activeOverlay} />}
 
       <style>{workspaceStyles}</style>
@@ -739,6 +860,10 @@ const workspaceStyles = `
     font-weight: 400;
     color: var(--text-secondary);
   }
+  .ws-change-filters-btn {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+  }
   .ws-header-center {
     flex: 1;
     display: flex;
@@ -771,9 +896,27 @@ const workspaceStyles = `
     gap: var(--sp-3);
     flex-shrink: 0;
   }
-  .ws-counter {
+  .ws-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ws-progress-bar {
+    width: 120px;
+    height: 6px;
+    background: var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .ws-progress-fill {
+    height: 100%;
+    background: #4cb782;
+    border-radius: 3px;
+    transition: width 300ms ease;
+  }
+  .ws-progress-label {
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
   }
@@ -806,6 +949,18 @@ const workspaceStyles = `
     40% { transform: scale(1.3); }
     100% { transform: scale(1); }
   }
+  .ws-ghost-config {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--sp-1);
+    color: var(--text-muted);
+    transition: color 150ms;
+  }
+  .ws-ghost-config:hover {
+    color: var(--text-primary);
+  }
+
   .ws-logout {
     font-size: 0.75rem;
     padding: var(--sp-1) var(--sp-3);
@@ -984,7 +1139,7 @@ const workspaceStyles = `
     position: relative;
   }
 
-  /* Prompt (no issues loaded) */
+  /* Prompt (no issues loaded) — gamified */
   .ws-prompt {
     flex: 1;
     display: flex;
@@ -993,17 +1148,134 @@ const workspaceStyles = `
     justify-content: center;
     text-align: center;
     padding: var(--sp-8);
+    gap: 6px;
   }
+
+  /* Radar animation */
+  .ws-prompt-radar {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 12px;
+  }
+  .radar-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+  }
+  .radar-ring-1 {
+    opacity: 0.08;
+    animation: radar-pulse 3s ease-out infinite;
+  }
+  .radar-ring-2 {
+    opacity: 0.06;
+    animation: radar-pulse 3s ease-out 1s infinite;
+    inset: 15px;
+  }
+  .radar-ring-3 {
+    opacity: 0.04;
+    animation: radar-pulse 3s ease-out 2s infinite;
+    inset: 30px;
+  }
+  @keyframes radar-pulse {
+    0%   { transform: scale(0.85); opacity: 0.25; }
+    100% { transform: scale(1.3); opacity: 0; }
+  }
+  .radar-sweep {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      transparent 300deg,
+      var(--accent) 355deg,
+      transparent 360deg
+    );
+    opacity: 0.12;
+    animation: radar-spin 4s linear infinite;
+  }
+  @keyframes radar-spin {
+    to { transform: rotate(360deg); }
+  }
+  .radar-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    opacity: 0.5;
+    animation: center-breathe 3s ease-in-out infinite;
+  }
+  @keyframes center-breathe {
+    0%, 100% { opacity: 0.35; }
+    50%      { opacity: 0.7; }
+  }
+
   .ws-prompt-title {
     font-size: 1.25rem;
     font-weight: 300;
     letter-spacing: -0.01em;
-    margin-bottom: var(--sp-2);
+    animation: prompt-fade-up 0.6s ease-out both;
   }
   .ws-prompt-desc {
-    font-size: 0.875rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
-    max-width: 380px;
+    max-width: 340px;
+    line-height: 1.5;
+    animation: prompt-fade-up 0.6s ease-out 0.15s both;
+  }
+
+  /* Step hints */
+  .ws-prompt-hints {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    animation: prompt-fade-up 0.6s ease-out 0.3s both;
+  }
+  .ws-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--bg-elevated);
+    border: 1px solid rgba(94, 106, 210, 0.15);
+    transition: border-color 0.3s, color 0.3s;
+  }
+  .ws-hint-1 { animation: hint-pop 0.4s ease-out 0.6s both; }
+  .ws-hint-2 { animation: hint-pop 0.4s ease-out 0.8s both; }
+  .ws-hint-3 { animation: hint-pop 0.4s ease-out 1.0s both; }
+  @keyframes hint-pop {
+    0%   { transform: scale(0.7); opacity: 0; }
+    70%  { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .ws-hint-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.6;
+  }
+  .ws-hint-arrow {
+    color: var(--text-muted);
+    opacity: 0.3;
+    font-size: 0.75rem;
+    animation: prompt-fade-up 0.4s ease-out 0.7s both;
+  }
+
+  @keyframes prompt-fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   /* Loading shimmer */
@@ -1051,6 +1323,13 @@ const workspaceStyles = `
   @keyframes vignette-fade-in {
     from { opacity: 0; }
     to { opacity: 1; }
+  }
+
+  /* ── Card column (wraps ghost hints + card stack) ── */
+  .card-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   /* ── Card stack ─────────────────────────────────── */
