@@ -88,5 +88,21 @@ export interface PendingChange {
 }
 
 export type Screen = 'setup' | 'workspace' | 'review'
-export type Overlay = 'estimate' | 'label' | 'assignee' | 'project' | 'cheatsheet' | 'detail' | null
+export type Overlay = 'estimate' | 'label' | 'assignee' | 'project' | 'cheatsheet' | 'detail' | 'ghost-config' | null
+export type GhostKeyPosition = 'above' | 'overlay' | 'below'
+export type GhostStepId = 'priority' | 'estimate' | 'label' | 'assignee' | 'project'
+
+export interface GhostStepConfig {
+  id: GhostStepId
+  enabled: boolean
+}
+
+export const DEFAULT_GHOST_STEPS: GhostStepConfig[] = [
+  { id: 'priority', enabled: true },
+  { id: 'estimate', enabled: true },
+  { id: 'label', enabled: false },
+  { id: 'assignee', enabled: false },
+  { id: 'project', enabled: false },
+]
+
 export type Theme = 'dark' | 'light'
