@@ -345,7 +345,7 @@ export default function SetupScreen() {
             It does, and they're great. Linear is genuinely one of the best tools
             out there. I use it every day and love it so much I built this just to
             keep using it faster. But triage isn't the same as navigation. It's a
-            <em>workflow</em>. You need to rip through 50 issues, make a decision
+            <em> workflow</em>. You need to rip through 50 issues, make a decision
             on each one, and move on. That means chaining priority, estimate,
             label, and submit into a single flow instead of tabbing between
             sidebars and dropdowns.
